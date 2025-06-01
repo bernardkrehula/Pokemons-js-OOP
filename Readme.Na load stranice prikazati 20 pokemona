@@ -1,0 +1,6 @@
+1.Na load stranice prikazati 20 pokemona bilo kojih, (fetch request za 20 pokemona)
+2.Mozes ih prikazati u obicnoj listi <ol>
+3.Klik na bilo koji od klik itema treba da otvori modal koji ce prikazati vise informacija o tome jednom pokemonu (Novi fetch request za jednog pokemona), prikazi 4-5 informacija po zelji
+4.treba da postoji input koji ce kad submitas da nadje pokemona kojeg si ukucao ako nema toga pokemona not found
+5.Jos treba da postoji select input koji ce na promjenu da dohvati sa servera tip pokemona (vatra, voda, trava)
+6.Te pokemone takoder pokazati u listi

@@ -1,0 +1,40 @@
+html {
+    font-size: 62.5%;
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.main {
+    text-align: center;
+    margin-right: 200px;
+    margin-left: 200px;
+    margin-top: 40px;
+}
+.title {
+    font-size: 7rem;
+}
+.sort {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    margin-top: 20px;
+    font-size: 3.7rem;
+}
+.selector {
+    padding: 5px 15px;
+    font-size: 2.8rem;
+    border-radius: 15px;
+}
+.pokemons {
+    display: grid;
+    list-style-type: none;
+    font-size: 3.8rem;
+    grid-template-rows: auto;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px;
+}
+.pokemons li {
+    width: 100%;
+}
