@@ -34,7 +34,10 @@ html {
     grid-template-rows: auto;
     grid-template-columns: repeat(4, 1fr);
     gap: 40px;
+    margin-top: 40px;
 }
 .pokemons li {
     width: 100%;
+    text-transform: uppercase;
+    font-family: monospace;
 }

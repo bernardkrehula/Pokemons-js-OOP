@@ -1,4 +1,4 @@
-import { pokemonHtml } from "./script";
+import { pokemonHtml } from "./script.js";
 
 class Pokemon{
     constructor(name, height, abilities, weight, moves){
@@ -10,7 +10,7 @@ class Pokemon{
     }
     displayPokemon(pokemon){
         const html = `
-        <li>${pokemon.name}<li>
+        <li>${pokemon.name}</li>
         `;
         pokemonHtml.insertAdjacentHTML('beforeend', html);
     }
@@ -42,6 +42,7 @@ class PokemonsManager {
                     );
             })
             )
+            console.log(pokemons)
             return pokemons;
         }
         catch(error){
@@ -57,5 +58,4 @@ class PokemonsManager {
 }
 const pokemons = new PokemonsManager();
 pokemons.getPokemon();
-/* pokemons.returnPokemons(); */
-console.log(pokemonHtml)
+pokemons.returnPokemons(); 
