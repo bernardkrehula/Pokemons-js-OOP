@@ -16,18 +16,33 @@ class Pokemon{
     }
     displayPokemonAbilities(pokemon, pokemonHTML){
         const html = `
-        <div></div>
+        <div>
+            <h3>Height: ${pokemon.height}</h3>
+            <h3>Abilities: ${pokemon.abilities}</h3>
+            <h3>Weight: ${pokemon.weight}</h3>
+        </div>
         `;
         pokemonHTML.insertAdjacentHTML('beforeend', html);
-        console.log('radi')
+    }
+    removeAbilities(pokemonHTML){
+        const abilities = pokemonHTML.querySelector('div');
+        if(abilities){
+            abilities.remove();
+        }
+    }
+    toggleAbilities(pokemon, pokemonHTML) {
+        const existingAbilities = pokemonHTML.querySelector('div');
+        if (existingAbilities) {
+            this.removeAbilities(pokemonHTML);
+        } else {
+            this.displayPokemonAbilities(pokemon, pokemonHTML);
+        }
     }
 } 
 
 
 class PokemonsManager {
-    constructor(){
-        this.activePokemon = null;
-    }
+
     getPokemon = async () => {
         try {        
             const pokemonDataFetch = await fetch(`https://pokeapi.co/api/v2/pokemon`);
@@ -61,18 +76,15 @@ class PokemonsManager {
         const pokemonsList = await this.getPokemon();
         pokemonsList.forEach(pokemon => pokemon.displayPokemon(pokemon));
     }
-    setActivePokemon = async (pokemon) =>{
+    getActivePokemon = async (pokemon) =>{
         const findPokemon = await this.getPokemon();
         if(pokemon) {
             const foundPokemon = findPokemon.find(pokemons => pokemons.name == pokemon.className);
-            this.activePokemon = foundPokemon;
+            foundPokemon.toggleAbilities(foundPokemon, pokemon);
         }
     }
-    getActivePokemon = async (pokemon) => {
-        return this.activePokemon;
-    }
 
-//Height, abilities, weight, moves
+//Height, abilities, weight
 }
 export const pokemons = new PokemonsManager();
 pokemons.getPokemon();

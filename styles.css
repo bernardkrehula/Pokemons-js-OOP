@@ -41,3 +41,8 @@ html {
     text-transform: uppercase;
     font-family: monospace;
 }
+.pokemons h3 {
+    font-size: 2.7rem;
+    font-weight: 500;
+    margin-top: 10px;
+}
