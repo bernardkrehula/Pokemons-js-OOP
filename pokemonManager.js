@@ -1,44 +1,4 @@
-import { pokemonHtml } from "./script.js";
-
-class Pokemon{
-    constructor(name, height, abilities, weight, moves){
-        this.name = name;
-        this.height = height;
-        this.abilities = abilities;
-        this.weight = weight;
-        this.moves = moves;
-    }
-    displayPokemon(pokemon){
-        const html = `
-        <li class='${pokemon.name}'>${pokemon.name}</li>
-        `;
-        pokemonHtml.insertAdjacentHTML('beforeend', html);
-    }
-    displayPokemonAbilities(pokemon, pokemonHTML){
-        const html = `
-        <div>
-            <h3>Height: ${pokemon.height}</h3>
-            <h3>Abilities: ${pokemon.abilities}</h3>
-            <h3>Weight: ${pokemon.weight}</h3>
-        </div>
-        `;
-        pokemonHTML.insertAdjacentHTML('beforeend', html);
-    }
-    removeAbilities(pokemonHTML){
-        const abilities = pokemonHTML.querySelector('div');
-        if(abilities){
-            abilities.remove();
-        }
-    }
-    toggleAbilities(pokemon, pokemonHTML) {
-        const existingAbilities = pokemonHTML.querySelector('div');
-        if (existingAbilities) {
-            this.removeAbilities(pokemonHTML);
-        } else {
-            this.displayPokemonAbilities(pokemon, pokemonHTML);
-        }
-    }
-} 
+import { pokemonsHtml } from "./script.js";
 
 
 class PokemonsManager {
@@ -55,29 +15,11 @@ class PokemonsManager {
                 }
             const pokemonData = await pokemonDataFetch.json();
 
-            const pokemons = await Promise.all(
-                pokemonData.results.map(async pokemon => {
-                    const response = await fetch(pokemon.url);
-                    const data = await response.json();
-
-                    return new Pokemon(
-                        data.name,
-                        data.height,
-                        data.abilities.map(abilities => abilities.ability.name),
-                        data.weight,
-                        data.moves.map(moves => moves.move.name)
-                    );
-            })
-            )
-            return pokemons;
+            this.setPokemons(pokemonData.results);
         }
         catch(error){
             console.log(error);
         }
-    }
-    returnPokemons = async () => {
-        const pokemonsList = await this.getPokemon();
-        pokemonsList.forEach(pokemon => pokemon.displayPokemon(pokemon));
     }
     setPokemons(pokeList){
         this.pokemons = pokeList;
@@ -92,21 +34,52 @@ class PokemonsManager {
                 Accept: 'application/json'
         }
         const pokemonData = await pokemonDataFetch.json();
-        console.log(pokemonData)
+        return this.activePokemon = pokemonData;
     }
-    /* getActivePokemon = async (pokemon) =>{
-        const findPokemon = await this.getPokemon();
-        if(pokemon) {
-            const foundPokemon = findPokemon.find(pokemons => pokemons.name == pokemon.className);
-            foundPokemon.toggleAbilities(foundPokemon, pokemon);
+    displayPokemon(pokemon){
+        const html = `
+        <li class='${pokemon.name}'>${pokemon.name}</li>
+        `;
+        pokemonsHtml.insertAdjacentHTML('beforeend', html);
+    }
+    iterateThroughPokemons = async () => {
+        await this.getPokemon();
+        this.pokemons.forEach(pokemon => {
+            this.displayPokemon(pokemon);
+        })
+    }
+    displayActivePokemon = async (pokemon, pokeHTML) => {
+        await this.getActivePokemon(pokemon);
+        const ability = this.activePokemon.abilities.map(ability => ability.ability.name);
+        const html = `
+            <div>
+                <h3>Height: ${this.activePokemon.height}</h3>
+                <h3>Abilities: ${ability}</h3>
+                <h3>Weight: ${this.activePokemon.weight}</h3>
+            </div>
+        `;
+        pokeHTML.insertAdjacentHTML('beforeend', html);
+    }
+    removeAbilities(pokemonHTML){
+        const abilities = pokemonHTML.querySelector('div');
+        if(abilities){
+            abilities.remove();
         }
-    } */
+    }
+    toggleAbilities(pokemon, pokemonHTML) {
+        const existingAbilities = pokemonHTML.querySelector('div');
+        if (existingAbilities) {
+            this.removeAbilities(pokemonHTML);
+        } else {
+            this.displayActivePokemon(pokemon, pokemonHTML);
+        }
+    }
 
 //Height, abilities, weight
 }
 export const pokemons = new PokemonsManager();
 pokemons.getPokemon();
-pokemons.returnPokemons(); 
+pokemons.iterateThroughPokemons();
 //Napravi u pokemon manager polje pokemons = []
 //Napravi metodu setPokemons 
 //SetPokemons koristis kad god ti zahjetv ka serveru vraca array (tj na pocetak na pocekat ti vraca array i kad sortiras za vatru vodu...)
