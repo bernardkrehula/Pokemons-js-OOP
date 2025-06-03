@@ -5,6 +5,9 @@ pokemonHtml.addEventListener('click', async (e) => {
     const pokemon = e.target.closest('li');
 
     if(pokemon){
-        await pokemons.getActivePokemon(pokemon);
+        const getPoke = await pokemons.getPokemon();
+        pokemons.setPokemons(getPoke);
+        const foundPokemon = pokemons.findActivePokemon(pokemon);
+        pokemons.getActivePokemon(foundPokemon);
     }
 });

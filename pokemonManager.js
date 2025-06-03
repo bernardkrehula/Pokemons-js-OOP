@@ -42,7 +42,10 @@ class Pokemon{
 
 
 class PokemonsManager {
-
+    constructor(){
+        this.pokemons = null;
+        this.activePokemon = null;
+    }
     getPokemon = async () => {
         try {        
             const pokemonDataFetch = await fetch(`https://pokeapi.co/api/v2/pokemon`);
@@ -76,16 +79,35 @@ class PokemonsManager {
         const pokemonsList = await this.getPokemon();
         pokemonsList.forEach(pokemon => pokemon.displayPokemon(pokemon));
     }
-    getActivePokemon = async (pokemon) =>{
+    setPokemons(pokeList){
+        this.pokemons = pokeList;
+    }
+    findActivePokemon(pokeName){
+        return this.pokemons.find(pokemon => pokemon.name === pokeName.className);
+    }
+    getActivePokemon = async (foundPokemon) => {
+        const pokemonDataFetch = await fetch(`https://pokeapi.co/api/v2/pokemon/${foundPokemon.name}`);
+        method: 'GET'
+        headers: {
+                Accept: 'application/json'
+        }
+        const pokemonData = await pokemonDataFetch.json();
+        console.log(pokemonData)
+    }
+    /* getActivePokemon = async (pokemon) =>{
         const findPokemon = await this.getPokemon();
         if(pokemon) {
             const foundPokemon = findPokemon.find(pokemons => pokemons.name == pokemon.className);
             foundPokemon.toggleAbilities(foundPokemon, pokemon);
         }
-    }
+    } */
 
 //Height, abilities, weight
 }
 export const pokemons = new PokemonsManager();
 pokemons.getPokemon();
 pokemons.returnPokemons(); 
+//Napravi u pokemon manager polje pokemons = []
+//Napravi metodu setPokemons 
+//SetPokemons koristis kad god ti zahjetv ka serveru vraca array (tj na pocetak na pocekat ti vraca array i kad sortiras za vatru vodu...)
+//Klasa pokemon mi ni netreba sve u pokemons manager
