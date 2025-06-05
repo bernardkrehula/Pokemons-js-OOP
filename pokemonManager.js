@@ -14,11 +14,39 @@ class PokemonsManager {
                     Accept: 'application/json'
                 }
             const pokemonData = await pokemonDataFetch.json();
-
+            
             this.setPokemons(pokemonData.results);
+    
         }
         catch(error){
             console.log(error);
+        }
+    }
+    getPokemonsType = async (selectedType) =>{
+        try {
+            const pokemonDetailsFetch = await fetch(`https://pokeapi.co/api/v2/pokemon`);
+            method: 'GET'
+            headers: {
+                Accept: 'application/json'
+            }
+            const pokemonDetails = await pokemonDetailsFetch.json();
+
+            this.activePokemon = [];
+
+            this.activePokemon = await Promise.all(
+            pokemonDetails.results.map(async result => {
+                const getEachPoke = await fetch(`https://pokeapi.co/api/v2/pokemon/${result.name}`)
+                 method: 'GET'
+                    headers: {
+                    Accept: 'application/json'
+                }
+                return getEachPoke.json();
+            })
+            )
+            return this.activePokemon;
+        }
+        catch(error){
+            console.log(error)
         }
     }
     setPokemons(pokeList){
@@ -35,6 +63,19 @@ class PokemonsManager {
         }
         const pokemonData = await pokemonDataFetch.json();
         return this.activePokemon = pokemonData;
+    }
+    filterPokemons = async (option) => {
+        try {
+            await this.getPokemonsType();
+            await Promise.all(this.activePokemon);
+            console.log(option)
+            this.activePokemon.filter(pokemon => {
+                const type = pokemon.types.forEach(type => console.log(type.type));
+        });
+
+    } catch (error) {
+        console.error('Error:', error);
+    }
     }
     displayPokemon(pokemon){
         const html = `
@@ -74,6 +115,7 @@ class PokemonsManager {
             this.displayActivePokemon(pokemon, pokemonHTML);
         }
     }
+    //vatra, voda, trava, bug, normal,
 
 //Height, abilities, weight
 }

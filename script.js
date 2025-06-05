@@ -1,5 +1,6 @@
 import { pokemons } from "./pokemonManager.js";
 export const pokemonsHtml = document.querySelector('.pokemons');
+const selector = document.querySelector('.selector');
 
 pokemonsHtml.addEventListener('click', async (e) => {
     const pokemon = e.target.closest('li');
@@ -10,3 +11,11 @@ pokemonsHtml.addEventListener('click', async (e) => {
         pokemons.toggleAbilities(foundPokemon, pokemon);
     }
 });
+
+selector.addEventListener('change', (e) => {
+    const option = e.target.value;
+
+/*     pokemons.getPokemonsType();
+ */    pokemons.filterPokemons(option);
+
+})
