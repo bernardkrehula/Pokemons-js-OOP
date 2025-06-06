@@ -67,12 +67,19 @@ class PokemonsManager {
     filterPokemons = async (option) => {
         try {
             await this.getPokemonsType();
-            await Promise.all(this.activePokemon);
-            console.log(option)
-            this.activePokemon.filter(pokemon => {
-                const type = pokemon.types.forEach(type => console.log(type.type));
-        });
 
+            await Promise.all(this.activePokemon);
+
+            this.activePokemon = this.activePokemon.filter(pokemon => 
+                pokemon.types.some(typeObj => 
+                    typeObj.type.name.toLowerCase() === option.toLowerCase()
+            )
+        );
+        
+        pokemonsHtml.innerHTML = '';
+        this.activePokemon.forEach(pokemon => {
+            this.displayPokemon(pokemon);
+        })
     } catch (error) {
         console.error('Error:', error);
     }
