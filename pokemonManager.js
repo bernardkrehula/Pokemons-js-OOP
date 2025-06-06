@@ -22,7 +22,7 @@ class PokemonsManager {
             console.log(error);
         }
     }
-    getPokemonsType = async (selectedType) =>{
+    getPokemonsType = async () =>{
         try {
             const pokemonDetailsFetch = await fetch(`https://pokeapi.co/api/v2/pokemon`);
             method: 'GET'
@@ -75,8 +75,9 @@ class PokemonsManager {
                     typeObj.type.name.toLowerCase() === option.toLowerCase()
             )
         );
-        
+
         pokemonsHtml.innerHTML = '';
+        
         this.activePokemon.forEach(pokemon => {
             this.displayPokemon(pokemon);
         })
@@ -86,13 +87,17 @@ class PokemonsManager {
     }
     displayPokemon(pokemon){
         const html = `
-        <li class='${pokemon.name}'>${pokemon.name}</li>
+            <li class='pokemon'>
+                <img src='${pokemon.sprites.front_default}'>
+                <h2>${pokemon.name}</h2>
+            </li>
         `;
         pokemonsHtml.insertAdjacentHTML('beforeend', html);
     }
     iterateThroughPokemons = async () => {
         await this.getPokemon();
-        this.pokemons.forEach(pokemon => {
+        await this.getPokemonsType();
+        this.activePokemon.forEach(pokemon => {
             this.displayPokemon(pokemon);
         })
     }
@@ -100,7 +105,7 @@ class PokemonsManager {
         await this.getActivePokemon(pokemon);
         const ability = this.activePokemon.abilities.map(ability => ability.ability.name);
         const html = `
-            <div>
+            <div class='type'>
                 <h3>Height: ${this.activePokemon.height}</h3>
                 <h3>Abilities: ${ability}</h3>
                 <h3>Weight: ${this.activePokemon.weight}</h3>

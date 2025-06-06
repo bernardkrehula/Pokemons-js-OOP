@@ -4,6 +4,7 @@ const selector = document.querySelector('.selector');
 
 pokemonsHtml.addEventListener('click', async (e) => {
     const pokemon = e.target.closest('li');
+    console.log(pokemon)
 
     if(pokemon){
         const foundPokemon = pokemons.findActivePokemon(pokemon);
