@@ -1,4 +1,6 @@
 import { pokemonsHtml } from "./script.js";
+import { showPokemonModal } from "./script.js";
+
 
 
 class PokemonsManager {
@@ -99,17 +101,18 @@ class PokemonsManager {
             this.displayPokemon(pokemon);
         })
     }
-    displayActivePokemon = async (pokemon, pokeHTML) => {
-        await this.getActivePokemon(pokemon);
+    displayActivePokemon = async (pokemon) => {
+       await this.getActivePokemon(pokemon);
         const ability = this.activePokemon.abilities.map(ability => ability.ability.name);
         const html = `
             <div class='type'>
+                <h3 style='text-transform: uppercase;'>${pokemon.name}</h3>
                 <h3>Height: ${this.activePokemon.height}</h3>
-                <h3>Abilities: ${ability}</h3>
+                <h3>Abilities: ${ability.join(', ')}</h3>
                 <h3>Weight: ${this.activePokemon.weight}</h3>
             </div>
         `;
-        pokeHTML.insertAdjacentHTML('beforeend', html);
+        showPokemonModal(html);
     }
     removeAbilities(pokemonHTML){
         const abilities = pokemonHTML.querySelector('div');

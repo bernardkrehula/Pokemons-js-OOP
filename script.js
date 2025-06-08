@@ -18,3 +18,18 @@ selector.addEventListener('change', (e) => {
     pokemons.getSelectedPokemonData(option);
 
 })
+
+export function showPokemonModal(htmlContent) {
+    const overlay = document.getElementById('overlay');
+    const pokeContent = document.getElementById('pokeContent');
+    pokeContent.innerHTML = htmlContent;
+    overlay.style.display = 'block';
+    pokeContent.style.display = 'block';
+}
+
+export function closePokemonModal() {
+    document.getElementById('overlay').style.display = 'none';
+    document.getElementById('pokeContent').style.display = 'none';
+}
+
+document.getElementById('overlay').addEventListener('click', closePokemonModal);
