@@ -4,6 +4,7 @@ import { pokemonsHtml } from "./script.js";
 class PokemonsManager {
     constructor(){
         this.pokemons = null;
+        this.pokemonDetails = null;
         this.activePokemon = null;
     }
     getPokemon = async () => {
@@ -16,7 +17,7 @@ class PokemonsManager {
             const pokemonData = await pokemonDataFetch.json();
             
             this.setPokemons(pokemonData.results);
-    
+            return this.pokemons;
         }
         catch(error){
             console.log(error);
@@ -24,26 +25,15 @@ class PokemonsManager {
     }
     getPokemonsData = async () =>{
         try {
-            const pokemonDetailsFetch = await fetch(`https://pokeapi.co/api/v2/pokemon`);
-            method: 'GET'
-            headers: {
-                Accept: 'application/json'
-            }
-            const pokemonDetails = await pokemonDetailsFetch.json();
-            
-            this.activePokemon = [];
-
-            this.activePokemon = await Promise.all(
-            pokemonDetails.results.map(async result => {
-                const getEachPoke = await fetch(`https://pokeapi.co/api/v2/pokemon/${result.name}`)
-                 method: 'GET'
-                    headers: {
-                    Accept: 'application/json'
-                }
-                return getEachPoke.json();
-            })
-            )
-            return this.activePokemon;
+            this.pokemonDetails = await Promise.all(this.pokemons.map(async pokemon => {
+                    const getEachPoke = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`)
+                    method: 'GET'
+                        headers: {
+                        Accept: 'application/json'
+                    }
+                    return getEachPoke.json();
+                }))
+            return this.pokemonDetails;
         }
         catch(error){
             console.log(error)
@@ -51,18 +41,9 @@ class PokemonsManager {
     }
     getSelectedPokemonData = async (option) =>{
        try {
-            const pokemonDetailsFetch = await fetch(`https://pokeapi.co/api/v2/pokemon`);
-            method: 'GET'
-            headers: {
-                Accept: 'application/json'
-            }
-            const pokemonDetails = await pokemonDetailsFetch.json();
-            
-            this.activePokemon = [];
-
             const pokes = await Promise.all(
-            pokemonDetails.results.map(async result => {
-                const getEachPoke = await fetch(`https://pokeapi.co/api/v2/pokemon/${result.name}`)
+            this.pokemons.map(async pokemon => {
+                const getEachPoke = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`)
                  method: 'GET'
                     headers: {
                     Accept: 'application/json'
@@ -70,6 +51,7 @@ class PokemonsManager {
                 return getEachPoke.json();
             })
             )
+            
             this.filterPokemons(option, pokes);
         }
         catch(error){
@@ -92,11 +74,11 @@ class PokemonsManager {
         return this.activePokemon = pokemonData;
     }
     filterPokemons  (option, pokes)  {
-        this.activePokemon = [];
         pokemonsHtml.innerHTML = '';
         pokes.forEach(poke => {
             const filteredPoke = poke.types.some(pokemon => pokemon.type.name === option.toLowerCase());
             if(filteredPoke){
+                this.activePokemon = poke;
                 this.displayPokemon(poke);
             }
         })
@@ -113,7 +95,7 @@ class PokemonsManager {
     iterateThroughPokemons = async () => {
         await this.getPokemon();
         await this.getPokemonsData();
-        this.activePokemon.forEach(pokemon => {
+        this.pokemonDetails.forEach(pokemon => {
             this.displayPokemon(pokemon);
         })
     }
@@ -143,17 +125,11 @@ class PokemonsManager {
             this.displayActivePokemon(pokemon, pokemonHTML);
         }
     }
-    //vatra, voda, trava, bug, normal,
 
-//Height, abilities, weight
 }
 export const pokemons = new PokemonsManager();
 pokemons.getPokemon();
 pokemons.iterateThroughPokemons();
-//Napravi u pokemon manager polje pokemons = []
-//Napravi metodu setPokemons 
-//SetPokemons koristis kad god ti zahjetv ka serveru vraca array (tj na pocetak na pocekat ti vraca array i kad sortiras za vatru vodu...)
-//Klasa pokemon mi ni netreba sve u pokemons manager
 
 //Napraviti neki modal da iskoci kad kliknem na pokemona a ne da se doda content
 //Pozvati samo one pokemone koji su selektirani na option i spremiti ti ih u activePokemon

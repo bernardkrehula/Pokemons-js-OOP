@@ -6,7 +6,6 @@ pokemonsHtml.addEventListener('click', async (e) => {
     const pokemon = e.target.closest('li');
 
     if(pokemon){
-        console.log(pokemons.getPokemon())
         const foundPokemon = pokemons.findActivePokemon(pokemon);
         pokemons.getActivePokemon(foundPokemon);
         pokemons.toggleAbilities(foundPokemon, pokemon);
