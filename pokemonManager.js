@@ -22,7 +22,7 @@ class PokemonsManager {
             console.log(error);
         }
     }
-    getPokemonsType = async () =>{
+    getPokemonsData = async () =>{
         try {
             const pokemonDetailsFetch = await fetch(`https://pokeapi.co/api/v2/pokemon`);
             method: 'GET'
@@ -30,7 +30,7 @@ class PokemonsManager {
                 Accept: 'application/json'
             }
             const pokemonDetails = await pokemonDetailsFetch.json();
-
+            
             this.activePokemon = [];
 
             this.activePokemon = await Promise.all(
@@ -49,11 +49,38 @@ class PokemonsManager {
             console.log(error)
         }
     }
+    getSelectedPokemonData = async (option) =>{
+       try {
+            const pokemonDetailsFetch = await fetch(`https://pokeapi.co/api/v2/pokemon`);
+            method: 'GET'
+            headers: {
+                Accept: 'application/json'
+            }
+            const pokemonDetails = await pokemonDetailsFetch.json();
+            
+            this.activePokemon = [];
+
+            const pokes = await Promise.all(
+            pokemonDetails.results.map(async result => {
+                const getEachPoke = await fetch(`https://pokeapi.co/api/v2/pokemon/${result.name}`)
+                 method: 'GET'
+                    headers: {
+                    Accept: 'application/json'
+                }
+                return getEachPoke.json();
+            })
+            )
+            this.filterPokemons(option, pokes);
+        }
+        catch(error){
+            console.log(error)
+        }
+    }
     setPokemons(pokeList){
         this.pokemons = pokeList;
     }
     findActivePokemon(pokeName){
-        return this.pokemons.find(pokemon => pokemon.name === pokeName.className);
+        return this.pokemons.find(pokemon => pokemon.name === pokeName.id);
     }
     getActivePokemon = async (foundPokemon) => {
         const pokemonDataFetch = await fetch(`https://pokeapi.co/api/v2/pokemon/${foundPokemon.name}`);
@@ -64,30 +91,19 @@ class PokemonsManager {
         const pokemonData = await pokemonDataFetch.json();
         return this.activePokemon = pokemonData;
     }
-    filterPokemons = async (option) => {
-        try {
-            await this.getPokemonsType();
-
-            await Promise.all(this.activePokemon);
-
-            this.activePokemon = this.activePokemon.filter(pokemon => 
-                pokemon.types.some(typeObj => 
-                    typeObj.type.name.toLowerCase() === option.toLowerCase()
-            )
-        );
-
+    filterPokemons  (option, pokes)  {
+        this.activePokemon = [];
         pokemonsHtml.innerHTML = '';
-        
-        this.activePokemon.forEach(pokemon => {
-            this.displayPokemon(pokemon);
+        pokes.forEach(poke => {
+            const filteredPoke = poke.types.some(pokemon => pokemon.type.name === option.toLowerCase());
+            if(filteredPoke){
+                this.displayPokemon(poke);
+            }
         })
-    } catch (error) {
-        console.error('Error:', error);
-    }
     }
     displayPokemon(pokemon){
         const html = `
-            <li class='pokemon'>
+            <li class='pokemon' id=${pokemon.name}>
                 <img src='${pokemon.sprites.front_default}'>
                 <h2>${pokemon.name}</h2>
             </li>
@@ -96,7 +112,7 @@ class PokemonsManager {
     }
     iterateThroughPokemons = async () => {
         await this.getPokemon();
-        await this.getPokemonsType();
+        await this.getPokemonsData();
         this.activePokemon.forEach(pokemon => {
             this.displayPokemon(pokemon);
         })
@@ -138,3 +154,6 @@ pokemons.iterateThroughPokemons();
 //Napravi metodu setPokemons 
 //SetPokemons koristis kad god ti zahjetv ka serveru vraca array (tj na pocetak na pocekat ti vraca array i kad sortiras za vatru vodu...)
 //Klasa pokemon mi ni netreba sve u pokemons manager
+
+//Napraviti neki modal da iskoci kad kliknem na pokemona a ne da se doda content
+//Pozvati samo one pokemone koji su selektirani na option i spremiti ti ih u activePokemon

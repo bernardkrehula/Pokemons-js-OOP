@@ -4,9 +4,9 @@ const selector = document.querySelector('.selector');
 
 pokemonsHtml.addEventListener('click', async (e) => {
     const pokemon = e.target.closest('li');
-    console.log(pokemon)
 
     if(pokemon){
+        console.log(pokemons.getPokemon())
         const foundPokemon = pokemons.findActivePokemon(pokemon);
         pokemons.getActivePokemon(foundPokemon);
         pokemons.toggleAbilities(foundPokemon, pokemon);
@@ -15,8 +15,7 @@ pokemonsHtml.addEventListener('click', async (e) => {
 
 selector.addEventListener('change', (e) => {
     const option = e.target.value;
-
-/*     pokemons.getPokemonsType();
- */    pokemons.filterPokemons(option);
+    
+    pokemons.getSelectedPokemonData(option);
 
 })
