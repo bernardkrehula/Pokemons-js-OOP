@@ -9,9 +9,20 @@ class PokemonsManager {
         this.pokemonDetails = null;
         this.activePokemon = null;
     }
-    getPokemon = async () => {
+    getPokemonsArrayLength = async () =>{
+        try {
+            const pokemonsDataFetch = await fetch(`https://pokeapi.co/api/v2/pokemon`)
+            const pokemonsData = await pokemonsDataFetch.json();
+            return pokemonsData.results.length;
+        }
+        catch(error){
+            console.log(error)
+        }
+    }
+    getPokemons = async (name) => {
         try {        
-            const pokemonDataFetch = await fetch(`https://pokeapi.co/api/v2/pokemon`);
+            const pokemonDataFetch = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
+            //Name ili id 
             method: 'GET'
             headers: {
                     Accept: 'application/json'
@@ -25,23 +36,19 @@ class PokemonsManager {
             console.log(error);
         }
     }
+    //Provjeriti dokumentaciju za pokemon type
+    //Na on change select inputa pozovi za pokemon type end point
+    //Uvijek koristi ili state pokemons ili state activePokemon
+    
     getPokemonsData = async () =>{
         try {
-            this.pokemonDetails = await Promise.all(this.pokemons.map(async pokemon => {
-                    const getEachPoke = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`)
-                    method: 'GET'
-                        headers: {
-                        Accept: 'application/json'
-                    }
-                    return getEachPoke.json();
-                }))
-            return this.pokemonDetails;
+            const pokemonsArrayLength = await this.getPokemonsArrayLength();
         }
         catch(error){
             console.log(error)
         }
     }
-    getSelectedPokemonData = async (option) =>{
+    /* getSelectedPokemonData = async (option) =>{
        try {
             const pokes = await Promise.all(
             this.pokemons.map(async pokemon => {
@@ -59,9 +66,10 @@ class PokemonsManager {
         catch(error){
             console.log(error)
         }
-    }
+    } */
     setPokemons(pokeList){
         this.pokemons = pokeList;
+        console.log(this.pokemons)
     }
     findActivePokemon(pokeName){
         return this.pokemons.find(pokemon => pokemon.name === pokeName.id);
@@ -95,7 +103,7 @@ class PokemonsManager {
         pokemonsHtml.insertAdjacentHTML('beforeend', html);
     }
     iterateThroughPokemons = async () => {
-        await this.getPokemon();
+        await this.getPokemons();
         await this.getPokemonsData();
         this.pokemonDetails.forEach(pokemon => {
             this.displayPokemon(pokemon);
@@ -131,8 +139,11 @@ class PokemonsManager {
 
 }
 export const pokemons = new PokemonsManager();
-pokemons.getPokemon();
+pokemons.getPokemons();
 pokemons.iterateThroughPokemons();
 
 //Napraviti neki modal da iskoci kad kliknem na pokemona a ne da se doda content
 //Pozvati samo one pokemone koji su selektirani na option i spremiti ti ih u activePokemon
+
+//Napraviti search input
+//

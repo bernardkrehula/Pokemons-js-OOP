@@ -15,8 +15,8 @@ pokemonsHtml.addEventListener('click', async (e) => {
 selector.addEventListener('change', (e) => {
     const option = e.target.value;
     
-    pokemons.getSelectedPokemonData(option);
-
+/*     pokemons.getSelectedPokemonData(option);
+ */
 })
 
 export function showPokemonModal(htmlContent) {
