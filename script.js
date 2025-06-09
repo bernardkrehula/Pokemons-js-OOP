@@ -1,7 +1,20 @@
 import { pokemons } from "./pokemonManager.js";
 export const pokemonsHtml = document.querySelector('.pokemons');
 const selector = document.querySelector('.selector');
+const searchInput = document.querySelector('.searchBar');
 
+searchInput.addEventListener('input', (e) => {
+    pokemons.filterPokemonsOnSearch(searchInput.value);
+    pokemons.iterateThroughSearchedPokemons();
+})
+searchInput.addEventListener('keydown', (e) => {
+    if(e.key === 'Backspace' || e.key === 'Delete'){
+            pokemons.filterPokemonsOnSearch(searchInput.value);
+            pokemons.iterateThroughSearchedPokemons();
+                console.log('radi')
+
+        }
+})
 pokemonsHtml.addEventListener('click', async (e) => {
     const pokemon = e.target.closest('li');
 
@@ -15,8 +28,7 @@ pokemonsHtml.addEventListener('click', async (e) => {
 selector.addEventListener('change', (e) => {
     const option = e.target.value;
     
-/*     pokemons.getSelectedPokemonData(option);
- */
+    pokemons.getSelectedPokemonData(option);
 })
 
 export function showPokemonModal(htmlContent) {

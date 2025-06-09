@@ -1,28 +1,15 @@
 import { pokemonsHtml } from "./script.js";
 import { showPokemonModal } from "./script.js";
 
-
-
 class PokemonsManager {
     constructor(){
         this.pokemons = null;
         this.pokemonDetails = null;
         this.activePokemon = null;
     }
-    getPokemonsArrayLength = async () =>{
-        try {
-            const pokemonsDataFetch = await fetch(`https://pokeapi.co/api/v2/pokemon`)
-            const pokemonsData = await pokemonsDataFetch.json();
-            return pokemonsData.results.length;
-        }
-        catch(error){
-            console.log(error)
-        }
-    }
-    getPokemons = async (name) => {
+    getPokemon = async () => {
         try {        
-            const pokemonDataFetch = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
-            //Name ili id 
+            const pokemonDataFetch = await fetch(`https://pokeapi.co/api/v2/pokemon`);
             method: 'GET'
             headers: {
                     Accept: 'application/json'
@@ -36,19 +23,23 @@ class PokemonsManager {
             console.log(error);
         }
     }
-    //Provjeriti dokumentaciju za pokemon type
-    //Na on change select inputa pozovi za pokemon type end point
-    //Uvijek koristi ili state pokemons ili state activePokemon
-    
     getPokemonsData = async () =>{
         try {
-            const pokemonsArrayLength = await this.getPokemonsArrayLength();
+            this.pokemonDetails = await Promise.all(this.pokemons.map(async pokemon => {
+                    const getEachPoke = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`)
+                    method: 'GET'
+                        headers: {
+                        Accept: 'application/json'
+                    }
+                    return getEachPoke.json();
+                }))
+            return this.pokemonDetails;
         }
         catch(error){
             console.log(error)
         }
     }
-    /* getSelectedPokemonData = async (option) =>{
+    getSelectedPokemonData = async (option) =>{
        try {
             const pokes = await Promise.all(
             this.pokemons.map(async pokemon => {
@@ -58,18 +49,27 @@ class PokemonsManager {
                     Accept: 'application/json'
                 }
                 return getEachPoke.json();
+               
             })
             )
             
-            this.filterPokemons(option, pokes);
+            this.filterPokemonsOnClick(option, pokes);
         }
         catch(error){
             console.log(error)
         }
-    } */
+    }
     setPokemons(pokeList){
         this.pokemons = pokeList;
-        console.log(this.pokemons)
+    }
+    filterPokemonsOnSearch(value){
+        this.activePokemon = this.pokemonDetails.filter(pokemon => pokemon.name.match(value));
+    }
+    iterateThroughSearchedPokemons(){
+        pokemonsHtml.innerHTML = '';
+        this.activePokemon.forEach(pokemon => {
+            this.displayPokemon(pokemon);
+        })
     }
     findActivePokemon(pokeName){
         return this.pokemons.find(pokemon => pokemon.name === pokeName.id);
@@ -83,7 +83,7 @@ class PokemonsManager {
         const pokemonData = await pokemonDataFetch.json();
         return this.activePokemon = pokemonData;
     }
-    filterPokemons  (option, pokes)  {
+    filterPokemonsOnClick(option, pokes)  {
         pokemonsHtml.innerHTML = '';
         pokes.forEach(poke => {
             const filteredPoke = poke.types.some(pokemon => pokemon.type.name === option.toLowerCase());
@@ -103,7 +103,7 @@ class PokemonsManager {
         pokemonsHtml.insertAdjacentHTML('beforeend', html);
     }
     iterateThroughPokemons = async () => {
-        await this.getPokemons();
+        await this.getPokemon();
         await this.getPokemonsData();
         this.pokemonDetails.forEach(pokemon => {
             this.displayPokemon(pokemon);
@@ -139,11 +139,5 @@ class PokemonsManager {
 
 }
 export const pokemons = new PokemonsManager();
-pokemons.getPokemons();
+pokemons.getPokemon();
 pokemons.iterateThroughPokemons();
-
-//Napraviti neki modal da iskoci kad kliknem na pokemona a ne da se doda content
-//Pozvati samo one pokemone koji su selektirani na option i spremiti ti ih u activePokemon
-
-//Napraviti search input
-//
