@@ -17,11 +17,13 @@ export class PokemonsManager {
             console.log(error);
         }
     }
-
+    fetchPokemon(pokemon){
+        return fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon}`);
+    }
     getPokemonsData = async () => {
         try {
             this.pokemons = await Promise.all(this.pokemons.map(async pokemon => {
-                const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`);
+                const response = await this.fetchPokemon(pokemon.name);
                 const pokeData = await response.json();
                 pokemon.img = pokeData.sprites.front_default;
                 pokemon.id = pokeData.id;
@@ -55,7 +57,7 @@ export class PokemonsManager {
     }
     getSearchedPokemon = async(pokemon) =>{
         try{
-            const pokeDataFetch = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon}`);
+            const pokeDataFetch = await this.fetchPokemon(pokemon);
             if (!pokeDataFetch.ok) {
             throw new Error('Pokemon nije pronađen!');
             }
@@ -77,7 +79,7 @@ export class PokemonsManager {
     }
     getActivePokemon = async (pokemonId) => {
             try {
-                const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`);
+                const response = await this.fetchPokemon(pokemonId);
                 const data = await response.json();
                 const pokemon = {
                     name: data.name,
@@ -99,22 +101,6 @@ export class PokemonsManager {
     setPokemons(pokeList) {
         this.pokemons = pokeList;
     }
-    
-    //"https://pokeapi.co/api/v2/pokemon/6/" adresa za pojedinacnog pokemona
-    //Prilikom prikazivanja liste pokemona zakaci id pokemona
-    //Na click procitaj taj id i pozovi adresu iznad 
-    //Izvuci neke podatke koje hoces stavi ih u objekat
-    //I to je sad activePokemon
-    //Otvori modal i prikazi activePokemon podatke 
-    //Kad se klikne x da se zatvori modal
-    //Stavis da je active pokemon = null
-    //Prilikom kucanja u input na submit ista ova stvar iznad ali pretrazujem preko imena tj. vrijednost inputa
-    //
-
-    //Na klik prikazati content pokemona i ali na taj nacin da ga pozoves sa requestom
-    //Input staviti na submit i na enter naci pokemona preko api i napraviti request samo za tog pokemona
-    //Id su brojevi
-    //Treba nekako dohvatiti samo sliku za pokemona ime i url tj. id
     toggleAbilities(pokemon, pokemonHTML) {
         const existingAbilities = pokemonHTML.querySelector('div');
         if (existingAbilities) {
@@ -166,3 +152,8 @@ export class PokemonsManager {
 }
 
 export const pokemons = new PokemonsManager();
+
+//Pospremiti sve u jednu funkciju ovo gjde je getAcitve pokemon jer sve radi istu stvar ovo za fetch
+//Pogledaj sto je debounce 
+//Poziva se baza nakon kucanja u input ali nakon nekog delaya koristeci debounce
+//https://github.com/niksy/throttle-debounce
