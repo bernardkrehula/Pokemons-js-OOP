@@ -1,120 +1,129 @@
-import { pokemonsHtml } from "./script.js";
-import { showPokemonModal } from "./script.js";
+import { pokemonsHtml, showPokemonModal } from "./script.js";
 
-class PokemonsManager {
-    constructor(){
+export class PokemonsManager {
+    constructor() {
         this.pokemons = null;
-        this.pokemonDetails = null;
-        this.activePokemon = null;
+        this.activePokemon = [];
+        this.allPokemons = [];
     }
+
     getPokemon = async () => {
-        try {        
-            const pokemonDataFetch = await fetch(`https://pokeapi.co/api/v2/pokemon`);
-            method: 'GET'
-            headers: {
-                    Accept: 'application/json'
-                }
-            const pokemonData = await pokemonDataFetch.json();
-            
-            this.setPokemons(pokemonData.results);
+        try {
+            const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=40`);
+            const data = await response.json();
+            this.setPokemons(data.results);
             return this.pokemons;
-        }
-        catch(error){
+        } catch (error) {
             console.log(error);
         }
     }
-    getPokemonsData = async () =>{
+
+    getPokemonsData = async () => {
         try {
-            this.pokemonDetails = await Promise.all(this.pokemons.map(async pokemon => {
-                    const getEachPoke = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`)
-                    method: 'GET'
-                        headers: {
-                        Accept: 'application/json'
-                    }
-                    return getEachPoke.json();
-                }))
-            return this.pokemonDetails;
-        }
-        catch(error){
-            console.log(error)
-        }
-    }
-    getSelectedPokemonData = async (option) =>{
-       try {
-            const pokes = await Promise.all(
-            this.pokemons.map(async pokemon => {
-                const getEachPoke = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`)
-                 method: 'GET'
-                    headers: {
-                    Accept: 'application/json'
-                }
-                return getEachPoke.json();
-               
-            })
-            )
+            this.pokemons = await Promise.all(this.pokemons.map(async pokemon => {
+                const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`);
+                const pokeImg = await response.json();
+                pokemon.img = pokeImg.sprites.front_default;
+                return pokemon;
+            }));
             
-            this.filterPokemonsOnClick(option, pokes);
+            return this.pokemons;
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    getPokemonsByType = async (type) => {
+        try {
+            const response = await fetch(`https://pokeapi.co/api/v2/type/${type}`);
+            const data = await response.json();
+            console.log(data)
+            const limitedPokemons = data.pokemon.slice(0, 20).map(p => p.pokemon);
+            const pokesDetails = await Promise.all(limitedPokemons.map(async poke => {
+                const res = await fetch(poke.url);
+                return await res.json();
+            }));
+            this.activePokemon = pokesDetails;
+            this.displayFilteredPokemons(pokesDetails);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    getSearchedPokemon = async(pokemon) =>{
+        try{
+            const pokeDataFetch = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon}`);
+            const pokeData = await pokeDataFetch.json();
+            pokemonsHtml.innerHTML = '';
+            this.displayPokemon(pokeData);
         }
         catch(error){
             console.log(error)
         }
     }
-    setPokemons(pokeList){
+
+    displayFilteredPokemons = (pokemonsArray) => {
+        pokemonsHtml.innerHTML = '';
+        pokemonsArray.forEach(pokemon => this.displayPokemon(pokemon));
+    }
+
+    setPokemons(pokeList) {
         this.pokemons = pokeList;
     }
-    filterPokemonsOnSearch(value){
-        this.activePokemon = this.pokemonDetails.filter(pokemon => pokemon.name.match(value));
+
+    filterPokemonsOnSearch(value) {
+        this.activePokemon = this.allPokemons.filter(pokemon =>
+            pokemon.name.toLowerCase().includes(value.toLowerCase())
+        );
     }
-    iterateThroughSearchedPokemons(){
+
+    iterateThroughSearchedPokemons() {
         pokemonsHtml.innerHTML = '';
-        this.activePokemon.forEach(pokemon => {
-            this.displayPokemon(pokemon);
-        })
+        this.activePokemon.forEach(pokemon => this.displayPokemon(pokemon));
     }
-    findActivePokemon(pokeName){
-        return this.pokemons.find(pokemon => pokemon.name === pokeName.id);
+
+    findActivePokemon(pokeElement) {
+        return this.allPokemons.find(pokemon => pokemon.name === pokeElement.id);
     }
+
     getActivePokemon = async (foundPokemon) => {
-        const pokemonDataFetch = await fetch(`https://pokeapi.co/api/v2/pokemon/${foundPokemon.name}`);
-        method: 'GET'
-        headers: {
-                Accept: 'application/json'
+        try {
+            const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${foundPokemon.name}`);
+            this.activePokemon = await response.json();
+            return this.activePokemon;
+        } catch (error) {
+            console.log(error);
         }
-        const pokemonData = await pokemonDataFetch.json();
-        return this.activePokemon = pokemonData;
     }
-    filterPokemonsOnClick(option, pokes)  {
-        pokemonsHtml.innerHTML = '';
-        pokes.forEach(poke => {
-            const filteredPoke = poke.types.some(pokemon => pokemon.type.name === option.toLowerCase());
-            if(filteredPoke){
-                this.activePokemon = poke;
-                this.displayPokemon(poke);
-            }
-        })
+    //"https://pokeapi.co/api/v2/pokemon/6/" adresa za pojedinacnog pokemona
+    //Prilikom prikazivanja liste pokemona zakaci id pokemona
+    //Na click procitaj taj id i pozovi adresu iznad 
+    //Izvuci neke podatke koje hoces stavi ih u objekat
+    //I to je sad activePokemon
+    //Otvori modal i prikazi activePokemon podatke 
+    //Kad se klikne x da se zatvori modal
+    //Stavis da je active pokemon = null
+    //Prilikom kucanja u input na submit ista ova stvar iznad ali pretrazujem preko imena tj. vrijednost inputa
+    //
+
+    //Na klik prikazati content pokemona i ali na taj nacin da ga pozoves sa requestom
+    //Input staviti na submit i na enter naci pokemona preko api i napraviti request samo za tog pokemona
+    //Id su brojevi
+    //Treba nekako dohvatiti samo sliku za pokemona ime i url tj. id
+    toggleAbilities(pokemon, pokemonHTML) {
+        const existingAbilities = pokemonHTML.querySelector('div');
+        if (existingAbilities) {
+            existingAbilities.remove();
+        } else {
+            this.displayActivePokemon(pokemon);
+        }
     }
-    displayPokemon(pokemon){
-        const html = `
-            <li class='pokemon' id=${pokemon.name}>
-                <img src='${pokemon.sprites.front_default}'>
-                <h2>${pokemon.name}</h2>
-            </li>
-        `;
-        pokemonsHtml.insertAdjacentHTML('beforeend', html);
-    }
-    iterateThroughPokemons = async () => {
-        await this.getPokemon();
-        await this.getPokemonsData();
-        this.pokemonDetails.forEach(pokemon => {
-            this.displayPokemon(pokemon);
-        })
-    }
+
     displayActivePokemon = async (pokemon) => {
-       await this.getActivePokemon(pokemon);
-        const ability = this.activePokemon.abilities.map(ability => ability.ability.name);
+        await this.getActivePokemon(pokemon);
+        const ability = this.activePokemon.abilities.map(a => a.ability.name);
         const html = `
-            <div class='type'>
-                <h3 style='text-transform: uppercase;'>${pokemon.name}</h3>
+            <div class="type">
+                <h3 style="text-transform: uppercase;">${pokemon.name}</h3>
                 <h3>Height: ${this.activePokemon.height}</h3>
                 <h3>Abilities: ${ability.join(', ')}</h3>
                 <h3>Weight: ${this.activePokemon.weight}</h3>
@@ -122,22 +131,23 @@ class PokemonsManager {
         `;
         showPokemonModal(html);
     }
-    removeAbilities(pokemonHTML){
-        const abilities = pokemonHTML.querySelector('div');
-        if(abilities){
-            abilities.remove();
-        }
-    }
-    toggleAbilities(pokemon, pokemonHTML) {
-        const existingAbilities = pokemonHTML.querySelector('div');
-        if (existingAbilities) {
-            this.removeAbilities(pokemonHTML);
-        } else {
-            this.displayActivePokemon(pokemon, pokemonHTML);
-        }
+
+    displayPokemon(pokemon) {
+        const html = `
+            <li class="pokemon" id="${pokemon.url}">
+                <img src="${pokemon.sprites.front_default}">
+                <h2>${pokemon.name}</h2>
+            </li>
+        `;
+        pokemonsHtml.insertAdjacentHTML('beforeend', html);
     }
 
+    iterateThroughPokemons = async () => {
+        await this.getPokemon();
+        await this.getPokemonsData();
+        pokemonsHtml.innerHTML = '';
+        this.pokemons.forEach(pokemon => this.displayPokemon(pokemon));
+    }
 }
+
 export const pokemons = new PokemonsManager();
-pokemons.getPokemon();
-pokemons.iterateThroughPokemons();

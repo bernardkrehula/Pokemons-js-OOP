@@ -1,35 +1,38 @@
 import { pokemons } from "./pokemonManager.js";
+
 export const pokemonsHtml = document.querySelector('.pokemons');
 const selector = document.querySelector('.selector');
-const searchInput = document.querySelector('.searchBar');
+const searchBar = document.querySelector('.searchBar');
+const searchInput = document.querySelector('.searchBarInput');
 
-searchInput.addEventListener('input', (e) => {
-    pokemons.filterPokemonsOnSearch(searchInput.value);
-    pokemons.iterateThroughSearchedPokemons();
-})
-searchInput.addEventListener('keydown', (e) => {
-    if(e.key === 'Backspace' || e.key === 'Delete'){
-            pokemons.filterPokemonsOnSearch(searchInput.value);
-            pokemons.iterateThroughSearchedPokemons();
-                console.log('radi')
+searchBar.addEventListener('submit', (e) => {
+        e.preventDefault();
+/*     pokemons.filterPokemonsOnSearch(searchInput.value);
+ */    
+        pokemons.getSearchedPokemon(searchInput.value)
+/*     pokemons.iterateThroughSearchedPokemons();
+ */});
 
-        }
-})
-pokemonsHtml.addEventListener('click', async (e) => {
-    const pokemon = e.target.closest('li');
-
-    if(pokemon){
-        const foundPokemon = pokemons.findActivePokemon(pokemon);
-        pokemons.getActivePokemon(foundPokemon);
-        pokemons.toggleAbilities(foundPokemon, pokemon);
+searchBar.addEventListener('keydown', (e) => {
+    if (e.key === 'Backspace' || e.key === 'Delete') {
+        pokemons.filterPokemonsOnSearch(searchInput.value);
+        pokemons.iterateThroughSearchedPokemons();
     }
 });
 
-selector.addEventListener('change', (e) => {
-    const option = e.target.value;
-    
-    pokemons.getSelectedPokemonData(option);
-})
+pokemonsHtml.addEventListener('click', async (e) => {
+    const pokemonElement = e.target.closest('li');
+    if (pokemonElement) {
+        const foundPokemon = pokemons.findActivePokemon(pokemonElement);
+        await pokemons.getActivePokemon(foundPokemon);
+        pokemons.toggleAbilities(foundPokemon, pokemonElement);
+    }
+});
+
+selector.addEventListener('change', async (e) => {
+    const selectedType = e.target.value.toLowerCase();
+    await pokemons.getPokemonsByType(selectedType);
+});
 
 export function showPokemonModal(htmlContent) {
     const overlay = document.getElementById('overlay');
@@ -45,3 +48,6 @@ export function closePokemonModal() {
 }
 
 document.getElementById('overlay').addEventListener('click', closePokemonModal);
+
+pokemons.getPokemon();
+pokemons.iterateThroughPokemons();
