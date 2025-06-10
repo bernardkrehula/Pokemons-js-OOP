@@ -49,16 +49,10 @@ export class PokemonsManager {
             console.log(error);
         }
     }
-    getSearchedPokemon = async(pokemon) =>{
-        try{
-            const pokeDataFetch = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon}`);
-            const pokeData = await pokeDataFetch.json();
-            pokemonsHtml.innerHTML = '';
-            this.displayPokemon(pokeData);
-        }
-        catch(error){
-            console.log(error)
-        }
+    getSearchedPokemon(pokemonInput){
+        const foundPokemon = this.pokemons.find(pokemon => pokemon.name === pokemonInput);
+        pokemonsHtml.innerHTML = '';
+        this.displayPokemon(foundPokemon);
     }
 
     displayFilteredPokemons = (pokemonsArray) => {
@@ -135,7 +129,7 @@ export class PokemonsManager {
     displayPokemon(pokemon) {
         const html = `
             <li class="pokemon" id="${pokemon.url}">
-                <img src="${pokemon.sprites.front_default}">
+                <img src="${pokemon.img}">
                 <h2>${pokemon.name}</h2>
             </li>
         `;
