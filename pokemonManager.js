@@ -9,33 +9,23 @@ export class PokemonsManager {
 
     getPokemon = async () => {
         try {
-            const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=40`);
-            const data = await response.json();
+            const data = await this.fetchPokemon('?limit=40');
             this.setPokemons(data.results);
-            return this.pokemons;
-        } catch (error) {
-            console.log(error);
-        }
-    }
-    fetchPokemon(pokemon){
-        return fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon}`);
-    }
-    getPokemonsData = async () => {
-        try {
             this.pokemons = await Promise.all(this.pokemons.map(async pokemon => {
-                const response = await this.fetchPokemon(pokemon.name);
-                const pokeData = await response.json();
+                const pokeData = await this.fetchPokemon(pokemon.name);
                 pokemon.img = pokeData.sprites.front_default;
                 pokemon.id = pokeData.id;
                 return pokemon;
             }));
-            
             return this.pokemons;
         } catch (error) {
             console.log(error);
         }
     }
-
+    fetchPokemon = async(pokemon) => {
+        const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon}`);
+        return response.json();
+    }
     getPokemonsByType = async (type) => {
         try {
             const response = await fetch(`https://pokeapi.co/api/v2/type/${type}`);
@@ -56,13 +46,8 @@ export class PokemonsManager {
         }
     }
     getSearchedPokemon = async(pokemon) =>{
-        try{
-            const pokeDataFetch = await this.fetchPokemon(pokemon);
-            if (!pokeDataFetch.ok) {
-            throw new Error('Pokemon nije pronađen!');
-            }
-            
-            const pokeData = await pokeDataFetch.json();
+        try{ 
+            const pokeData = await this.fetchPokemon(pokemon);
             pokemonsHtml.innerHTML = '';
             const searchedPoke = {
                 name: pokeData.name,
@@ -79,8 +64,7 @@ export class PokemonsManager {
     }
     getActivePokemon = async (pokemonId) => {
             try {
-                const response = await this.fetchPokemon(pokemonId);
-                const data = await response.json();
+                const data = await this.fetchPokemon(pokemonId);
                 const pokemon = {
                     name: data.name,
                     height: data.height,
@@ -141,7 +125,6 @@ export class PokemonsManager {
 
     iterateThroughPokemons = async () => {
         await this.getPokemon();
-        await this.getPokemonsData();
         pokemonsHtml.innerHTML = '';
         this.pokemons.forEach(pokemon => this.displayPokemon(pokemon));
     }

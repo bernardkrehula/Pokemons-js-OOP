@@ -2,7 +2,6 @@ import { pokemons } from "./pokemonManager.js";
 
 export const pokemonsHtml = document.querySelector('.pokemons');
 const selector = document.querySelector('.selector');
-const searchBar = document.querySelector('.searchBar');
 const searchInput = document.querySelector('.searchBarInput');
 const main = document.querySelector('.main');
 
@@ -16,8 +15,7 @@ function debounce(func, delay){
         }, delay)
     }
 }
-function handleInput(e){
-    console.log('Pretraga', e.target.value);
+function handleInput(){
     pokemons.getSearchedPokemon(searchInput.value)
     searchInput.value = '';
 }
@@ -31,7 +29,8 @@ searchInput.addEventListener('input', debounceHandleInput)
 pokemonsHtml.addEventListener('click', async(e) => {
     const pokemonId = e.target.closest('li').id;
     const pokemonElement = e.target.closest('li');
-    if (pokemonId) {
+
+    if (pokemonElement) {
         await pokemons.getActivePokemon(pokemonId);
         pokemons.toggleAbilities(pokemonId, pokemonElement);
     }
