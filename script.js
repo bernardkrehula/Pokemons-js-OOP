@@ -6,11 +6,27 @@ const searchBar = document.querySelector('.searchBar');
 const searchInput = document.querySelector('.searchBarInput');
 const main = document.querySelector('.main');
 
-searchBar.addEventListener('submit', (e) => {
-        e.preventDefault();
-        pokemons.getSearchedPokemon(searchInput.value)
-        searchInput.value = '';
-    });
+function debounce(func, delay){
+    let timeoutId;
+
+    return function(...args){
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            func.apply(this, args)
+        }, delay)
+    }
+}
+function handleInput(e){
+    console.log('Pretraga', e.target.value);
+    pokemons.getSearchedPokemon(searchInput.value)
+    searchInput.value = '';
+}
+
+const debounceHandleInput = debounce(handleInput, 1000);
+
+searchInput.addEventListener('input', debounceHandleInput)
+
+
 
 pokemonsHtml.addEventListener('click', async(e) => {
     const pokemonId = e.target.closest('li').id;
